@@ -20,10 +20,12 @@
 	<body>
 		
 		<div id="grailsLogo" role="banner">
-			<a href="http://localhost:8080/collab-todo/">
-				<img src="${resource(dir: 'images', file: 'grails_logo.png')}" alt="Grails"/>
-			</a>
-
+			
+			<div id="logo">
+				<a href="http://localhost:8080/collab-todo/">
+					<img src="${resource(dir: 'images', file: 'grails_logo.png')}" alt="Grails"/>
+				</a>
+			</div>
 			<div id="topbar">
 				<g:render template="/common/topbar" />
 			</div>

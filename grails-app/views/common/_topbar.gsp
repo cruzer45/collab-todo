@@ -1,4 +1,4 @@
-<div id="menu">
+<div >
 	<span class="nobr">
 		<g:if test="${session.user}">
 			<b>${session.user?.firstName}&nbsp;${session.user?.lastName}</b> |
