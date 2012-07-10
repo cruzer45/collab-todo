@@ -49,6 +49,7 @@ body {
 
 #grailsLogo {
 	background-color: #abbf78;
+	min-height: 80px;
 }
 
 /* replace with .no-boxshadow body if you have modernizr available */
@@ -90,7 +91,11 @@ img {
 /* GENERAL */
 
 #grailsLogo a {
-	display: inline-block;
+	/*display: inline-block;*/
+	margin: 1em;
+}
+
+#grailsLogo a img {
 	margin: 1em;
 }
 
@@ -594,3 +599,29 @@ a.skip {
 	position: absolute;
 	left: -9999px;
 }
+
+#foot {
+	width: 100%;
+	clear:both;
+	text-align: center;
+	padding: 3px;
+	/*border-top: 1px solid #333;*/
+}
+
+#topbar {
+	/*text-align:left;
+	width: 778px;
+	margin: 0px auto;
+	padding: 5px 0;*/
+}
+
+#topbar #menu {
+	/*float: right;
+	width: 240px;
+	text-align: right;*/
+}
+
+#topbar #menu a{
+}
+
+.nobr  { white-space:nowrap; }
