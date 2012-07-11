@@ -1,76 +1,155 @@
 package collab.todo
 
-import grails.test.mixin.*
+
+
 import org.junit.*
+import grails.test.mixin.*
 
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
 @TestFor(UserController)
-class UserControllerTests  extends GroovyTestCase {
+@Mock(User)
+class UserControllerTests {
 
-	User user
-	UserController uc
+    def populateValidParams(params) {
+        assert params != null
+        // TODO: Populate valid properties like...
+        //params["name"] = 'someValidName'
+    }
 
-	void setUp() {
-		// Save a User
-		user = new User(userName:"User1", firstName:"User1FN", lastName:"User1LN")
-		user.save()
-		// Set up UserController
-		uc = new UserController()
-	}
+    void testIndex() {
+        controller.index()
+        assert "/user/list" == response.redirectedUrl
+    }
 
-	void tearDown() {
-		user.delete()
-	}
+    void testList() {
 
-	/**
-	 * Test the UserController.handleLogin action.
-	 *
-	 * If the login succeeds, it will put the user object into the session.
-	 */
-	void testHandleLogin() {
-		// Setup controller parameters
-		uc.params.userName = user.userName
-		// Call the action
-		uc.handleLogin()
-		// If action functioned correctly, it put a user object
-		// into the session
-		def sessUser = uc.session.user
-		assert sessUser
-		assertEquals("Expected ids to match", user.id, sessUser.id)
-		// And the user was redirected to the Todo Page
-		assertEquals "/todo", uc.response.redirectedUrl
-	}
+        def model = controller.list()
 
-	/**
-	 * Test the UserController.handleLogin action.
-	 *
-	 * If the login fails, it will redirect to login and set a flash message.
-	 */
-	void testHandleLoginInvalidUser() {
-		// Setup controller parameters
-		uc.params.userName = "INVALID_USER_NAME"
-		// Call the action
-		uc.handleLogin()
-		assertEquals "/user/login", uc.response.redirectedUrl
-		def message = uc.flash.message
-		assert message
-		assert message.startsWith("User not found")
-	}
+        assert model.userInstanceList.size() == 0
+        assert model.userInstanceTotal == 0
+    }
 
-	/**
-	 * Test the UserController.login action
-	 *
-	 * If the logout action succeeds, it will remove the user object from
-	 * the session.
-	 */
-	void testLogout() {
-		// make it look like user is logged in
-		uc.session.user = user
-		uc.logout()
-		def sessUser = uc.session.user
-		assertNull("Expected session user to be null", sessUser)
-		assertEquals "/user/login", uc.response.redirectedUrl
-	}
+    void testCreate() {
+        def model = controller.create()
+
+        assert model.userInstance != null
+    }
+
+    void testSave() {
+        controller.save()
+
+        assert model.userInstance != null
+        assert view == '/user/create'
+
+        response.reset()
+
+        populateValidParams(params)
+        controller.save()
+
+        assert response.redirectedUrl == '/user/show/1'
+        assert controller.flash.message != null
+        assert User.count() == 1
+    }
+
+    void testShow() {
+        controller.show()
+
+        assert flash.message != null
+        assert response.redirectedUrl == '/user/list'
+
+        populateValidParams(params)
+        def user = new User(params)
+
+        assert user.save() != null
+
+        params.id = user.id
+
+        def model = controller.show()
+
+        assert model.userInstance == user
+    }
+
+    void testEdit() {
+        controller.edit()
+
+        assert flash.message != null
+        assert response.redirectedUrl == '/user/list'
+
+        populateValidParams(params)
+        def user = new User(params)
+
+        assert user.save() != null
+
+        params.id = user.id
+
+        def model = controller.edit()
+
+        assert model.userInstance == user
+    }
+
+    void testUpdate() {
+        controller.update()
+
+        assert flash.message != null
+        assert response.redirectedUrl == '/user/list'
+
+        response.reset()
+
+        populateValidParams(params)
+        def user = new User(params)
+
+        assert user.save() != null
+
+        // test invalid parameters in update
+        params.id = user.id
+        //TODO: add invalid values to params object
+
+        controller.update()
+
+        assert view == "/user/edit"
+        assert model.userInstance != null
+
+        user.clearErrors()
+
+        populateValidParams(params)
+        controller.update()
+
+        assert response.redirectedUrl == "/user/show/$user.id"
+        assert flash.message != null
+
+        //test outdated version number
+        response.reset()
+        user.clearErrors()
+
+        populateValidParams(params)
+        params.id = user.id
+        params.version = -1
+        controller.update()
+
+        assert view == "/user/edit"
+        assert model.userInstance != null
+        assert model.userInstance.errors.getFieldError('version')
+        assert flash.message != null
+    }
+
+    void testDelete() {
+        controller.delete()
+        assert flash.message != null
+        assert response.redirectedUrl == '/user/list'
+
+        response.reset()
+
+        populateValidParams(params)
+        def user = new User(params)
+
+        assert user.save() != null
+        assert User.count() == 1
+
+        params.id = user.id
+
+        controller.delete()
+
+        assert User.count() == 0
+        assert User.get(user.id) == null
+        assert response.redirectedUrl == '/user/list'
+    }
 }
