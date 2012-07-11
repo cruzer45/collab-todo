@@ -6,7 +6,7 @@ class UserController {
 	def login = {}
 
 	def handleLogin = {
-		def user = User.findByUserName(params.userName)
+		def user = User.findByUserName(params.userName)?:null
 		if (!user) {
 			flash.message = "User not found for userName: ${params.userName}"
 			redirect(action:'login')
